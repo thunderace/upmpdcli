@@ -123,9 +123,9 @@ bool OHInfo::getEventData(bool all, std::vector<std::string>& names,
     }
     m_state = state;
 
-    for (auto& member : changed) {
-        names.push_back(member.first);
-        values.push_back(member.second);
+    for (auto member = changed.begin(); member != changed.end(); member++) {
+        names.push_back(member->first);
+        values.push_back(member->second);
     }
 
     return true;

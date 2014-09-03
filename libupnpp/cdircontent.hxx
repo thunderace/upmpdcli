@@ -101,16 +101,17 @@ public:
             " id [" << m_id << "] pid [" << m_pid <<
             "] title [" << m_title << "]" << std::endl;
         os << "Properties: " << std::endl;
-        for (auto& entry: m_props) {
-            os << "[" << entry.first << "]->[" << entry.second << "] " 
+        for (auto entry = m_props.begin(); entry != m_props.end(); entry++) {
+            os << "[" << entry->first << "]->[" << entry->second << "] " 
                << std::endl;
         }
         os << "Resources:" << std::endl;
-        for (auto& res: m_resources) {
-            os << "  Uri [" << res.m_uri << "]" << std::endl;
+        for (auto res = m_resources.begin(); res != m_resources.end(); res++) {
+            os << "  Uri [" << res->m_uri << "]" << std::endl;
             os << "  Resource attributes:" << std::endl;
-            for (auto& entry: res.m_props) {
-                os << "    [" << entry.first << "]->[" << entry.second << "] " 
+            for (auto entry = res->m_props.begin(); 
+		 entry != res->m_props.end();entry++) {
+                os << "    [" << entry->first << "]->[" << entry->second << "] " 
                    << std::endl;
             }
         }
