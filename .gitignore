@@ -29,3 +29,6 @@ stamp-h1
 upmpdcli
 web.tar.gz
 doc/*.html
+upmpdcli.conf
+scctl
+

@@ -247,12 +247,12 @@ bool initHttpFs(unordered_map<string, VDirContent>& files,
 
     if (!icondata.empty()) {
         files.insert(pair<string, VDirContent>
-                     (dir + "icon.png", 
+                     (datadir + "icon.png", 
                       VDirContent(icondata, "image/png")));
     }
     if (!presentationdata.empty()) {
         files.insert(pair<string, VDirContent>
-                     (dir + "presentation.html", 
+                     (datadir + "presentation.html", 
                       VDirContent(presentationdata, "text/html")));
     }
     return true;

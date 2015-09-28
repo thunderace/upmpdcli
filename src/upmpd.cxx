@@ -136,19 +136,23 @@ static int op_flags;
 #define OPT_i     0x200
 #define OPT_P     0x400
 #define OPT_O     0x800
+#define OPT_u     0x1000
+#define OPT_a     0x2000
 
 static const char usage[] = 
+    "-a datadir\t datadir to use\n"
     "-c configfile \t configuration file to use\n"
     "-h host    \t specify host MPD is running on\n"
     "-p port     \t specify MPD port\n"
     "-d logfilename\t debug messages to\n"
-    "-l loglevel\t  log level (0-6)\n"
-    "-D    \t run as a daemon\n"
+    "-l loglevel\t log level (0-6)\n"
+    "-u user \t if root run as this user\n"
+    "-D      \t run as a daemon\n"
     "-f friendlyname\t define device displayed name\n"
-    "-q 0|1\t if set, we own the mpd queue, else avoid clearing it whenever we feel like it\n"
+    "-q 0|1  \t if set, we own the mpd queue, else avoid clearing it whenever we feel like it\n"
     "-i iface    \t specify network interface name to be used for UPnP\n"
-    "-P upport    \t specify port number to be used for UPnP\n"
-    "-O 0|1\t decide if we run and export the OpenHome services\n"
+    "-P upport   \t specify port number to be used for UPnP\n"
+    "-O 0|1      \t decide if we run and export the OpenHome services\n"
     "\n"
     ;
 
@@ -210,8 +214,8 @@ int main(int argc, char *argv[])
     bool ohmetapersist = true;
     string upmpdcliuser("upmpdcli");
     string pidfilename("/var/run/upmpdcli.pid");
-    string iconpath(DATADIR "/icon.png");
-    string presentationhtml(DATADIR "/presentation.html");
+    string iconpath;
+    string presentationhtml;
     string iface;
     unsigned short upport = 0;
     string upnpip;
@@ -238,6 +242,8 @@ int main(int argc, char *argv[])
             Usage();
         while (**argv)
             switch (*(*argv)++) {
+            case 'a':   op_flags |= OPT_a; if (argc < 2)  Usage();
+                datadir = *(++argv); argc--; goto b1;
             case 'c':   op_flags |= OPT_c; if (argc < 2)  Usage();
                 g_configfilename = *(++argv); argc--; goto b1;
             case 'D':   op_flags |= OPT_D; break;
@@ -266,6 +272,8 @@ int main(int argc, char *argv[])
                 mpdport = atoi(*(++argv)); argc--; goto b1;
             case 'q':   op_flags |= OPT_q; if (argc < 2)  Usage();
                 ownqueue = atoi(*(++argv)) != 0; argc--; goto b1;
+            case 'u':   op_flags |= OPT_u; if (argc < 2)  Usage();
+                upmpdcliuser = *(++argv); argc--; goto b1;
             default: Usage();   break;
             }
     b1: argc--; argv++;
@@ -273,6 +281,9 @@ int main(int argc, char *argv[])
 
     if (argc != 0)
         Usage();
+    // update paths
+    iconpath = datadir + "/icon.png";
+    presentationhtml = datadir  + "/presentation.html";
 
     UpMpd::Options opts;
 
@@ -310,6 +321,7 @@ int main(int argc, char *argv[])
         if (config.get("ohmetapersist", value)) {
             ohmetapersist = atoi(value.c_str()) != 0;
         }
+
         config.get("iconpath", iconpath);
         config.get("presentationhtml", presentationhtml);
         config.get("cachedir", cachedir);
@@ -502,6 +514,7 @@ int main(int argc, char *argv[])
     // Initialize the data we serve through HTTP (device and service
     // descriptions, icons, presentation page, etc.)
     unordered_map<string, VDirContent> files;
+
     if (!initHttpFs(files, datadir, UUID, friendlyname, enableAV, enableOH, 
                     iconpath, presentationhtml)) {
         exit(1);
